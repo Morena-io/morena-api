@@ -1,4 +1,3 @@
-CREATE DATABASE morena;
 
 --
 -- Table structure for table `emails`

@@ -1,4 +1,4 @@
-var connection = require('../connection');
+var connection = require('../db/connection');
 
 function EmailController() {
   this.getAll = (res) => {
@@ -6,6 +6,8 @@ function EmailController() {
     connection.acquire((err, con) => {
       con.query('SELECT * FROM emails', (err, results) => {
         con.release();
+        res.status(200);
+        res.statusMessage = 'Emails retreived successfully';
         res.send(results);
       });
     });
@@ -19,17 +21,27 @@ function EmailController() {
       con.query('INSERT INTO emails SET ?', email, (err, results) => {
         con.release();
         if (err) {
+          res.status(400);
+          res.statusMessage = 'Email creation failed';
+
+          var message = err.code;
+          if (err.code === 'ER_DUP_ENTRY') {
+            var message = 'Duplicate email entry';
+          }
+
           res.send({
-            message: 'Email creation failed',
+            message: message,
             err: err
           });
-        } else {
-          email.id = results.insertId;
-          res.send({
-            message: 'Email created successfully',
-            email: email
-          });
+          return;
         }
+
+        email.id = results.insertId;
+        res.status(200);
+        res.statusMessage = 'Email created successfully';
+        res.send({
+          email: email
+        });
       });
     });
   };

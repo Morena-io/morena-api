@@ -38,7 +38,7 @@ function EmailController() {
             res.status(400);
             res.statusMessage = 'Email creation failed';
             res.send({
-              message: message,
+              message: err.code,
               err: err
             });
             return;

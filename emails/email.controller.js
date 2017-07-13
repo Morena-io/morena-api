@@ -1,50 +1,60 @@
 var connection = require('../db/connection');
 
 function EmailController() {
-  this.getAll = (res) => {
-    // TODO add caching
-    connection.acquire((err, con) => {
-      con.query('SELECT * FROM emails', (err, results) => {
-        con.release();
-        res.status(200);
-        res.statusMessage = 'Emails retreived successfully';
-        res.send(results);
-      });
-    });
-  };
+  var self = {
+    getAll: (res) => {
+      // TODO add caching
+      connection.acquire((err, con) => {
+        var query = 'SELECT * FROM `emails`';
+        con.query(query, (err, results) => {
+          con.release();
 
-  this.create = (email, res) => {
-    email.isPreLaunch = true;
-    console.log(email);
-    // TODO add caching
-    connection.acquire((err, con) => {
-      con.query('INSERT INTO emails SET ?', email, (err, results) => {
-        con.release();
-        if (err) {
-          res.status(400);
-          res.statusMessage = 'Email creation failed';
-
-          var message = err.code;
-          if (err.code === 'ER_DUP_ENTRY') {
-            var message = 'Duplicate email entry';
+          if (err) {
+            res.status(400);
+            res.send({
+              message: err.code,
+              err: err
+            });
+            return;
           }
 
-          res.send({
-            message: message,
-            err: err
-          });
-          return;
-        }
-
-        email.id = results.insertId;
-        res.status(200);
-        res.statusMessage = 'Email created successfully';
-        res.send({
-          email: email
+          res.status(200);
+          res.statusMessage = 'Emails retreived successfully';
+          res.send(results);
         });
       });
-    });
+    },
+    create: (email, res) => {
+      email.isPreLaunch = true;
+      console.log(email);
+      // TODO add caching
+      // TODO add check if email already exists in DB before trying to add
+      connection.acquire((err, con) => {
+        var query = 'INSERT INTO emails SET ?';
+        con.query(query, email, (err, results) => {
+          con.release();
+
+          if (err) {
+            res.status(400);
+            res.statusMessage = 'Email creation failed';
+            res.send({
+              message: message,
+              err: err
+            });
+            return;
+          }
+
+          email.id = results.insertId;
+          res.status(200);
+          res.statusMessage = 'Email created successfully';
+          res.send({
+            email: email
+          });
+        });
+      })
+    }
   };
+  return self;
 }
 
-module.exports = new EmailController();
+module.exports = EmailController();

@@ -27,7 +27,7 @@ app.use('/', baseRouter);
 
 connection.init();
 
-var port = process.env.API_PORT || 3002;
+var port = 3002;
 var server = app.listen(port, () => {
   console.log('Morena API listening on port ' + server.address().port);
 });

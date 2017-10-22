@@ -4,10 +4,9 @@
 --
 
 CREATE TABLE `emails` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `email_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dateAdded` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `isPreLaunch` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `date_added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `dateAdded` (`dateAdded`),
   UNIQUE KEY `email` (`email`)
